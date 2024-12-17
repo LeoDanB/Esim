@@ -1,0 +1,72 @@
+// C++ code
+//  Ciclo 10: Simulacion de Cinta transportadora.
+int Led1 = 2;
+int Boton1 = 3;
+int Led2 = 4;
+int Motor1 = 5;
+int Motor2 = 6;
+int Cms = 0;
+
+boolean Encendido = false;
+/*  Funcion manejo de Ultrasonido */
+//sensor de ultrasonido
+long u_tiempo(int trigger_pin, int echo_pin) {
+    digitalWrite(trigger_pin, LOW);
+    delayMicroseconds(2);
+    digitalWrite(trigger_pin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigger_pin, LOW);
+    long microseconds = pulseIn(echo_pin ,HIGH);
+    return microseconds;
+}
+
+long u_distancia(int trigger_pin, int echo_pin) {
+    long microseconds = u_tiempo(trigger_pin, echo_pin);
+    long u_distancia;
+    u_distancia = microseconds/29/2;
+    if (u_distancia == 0){
+        u_distancia = 999;
+    }
+    return u_distancia;
+}
+
+void setup()
+{
+  pinMode( 12 , INPUT );
+  pinMode( 13 , OUTPUT );
+  pinMode(Boton1, INPUT);
+  pinMode(Led1, OUTPUT);
+  digitalWrite(Led1, LOW);
+  pinMode(Led2, OUTPUT);
+  digitalWrite(Led2, LOW);
+  pinMode(Motor1, OUTPUT);
+  digitalWrite(Motor1, LOW);
+}
+
+void loop()
+{
+  if (Encendido) // Verifica Ultrasonido
+  {
+     Cms = u_distancia(13,12);
+     if (Cms < 20) { // Detiene Motor 1
+        Encendido = false;
+        digitalWrite(Led1, LOW);
+        digitalWrite(Motor1, LOW);
+       
+        // Enciende Motor2 5 segundos
+        digitalWrite(Motor2, HIGH);
+        digitalWrite(Led2, HIGH);
+        delay(5000);
+       
+        // Apaga Motor2
+        digitalWrite(Motor2, LOW);
+        digitalWrite(Led2, LOW);
+    }
+  }
+ else if (digitalRead(Boton1)==HIGH){ // Enciende Motor1
+     Encendido = true;
+     digitalWrite(Led1, HIGH);
+     digitalWrite(Motor1, HIGH);
+  }
+
+}
